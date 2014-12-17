@@ -5,6 +5,10 @@ class ProxyService::Worker < QueueWorker
   attr_accessor :message
   attr_writer :ready
 
+  def self.stomp
+    QueueWorker.stomp
+  end
+
   def call(message)
     @message = message
     @ready = true
