@@ -2,28 +2,34 @@ require 'json'
 
 class ProxyService
 
-  # = Class
-  # @example Usage
-  #
-  # ProxyService.new(:queue_name).with_mechanize do |agent|
-  #   agent.get('...')
-  # end
-  #
-
   POLL_PERIOD = 1
   MAX_FAILURES = 3
+
+  class << self
+    attr_accessor :proxies_enabled, :username, :password
+
+    def configure
+      yield self
+    end
+  end
 
   attr_accessor :source
   attr_writer :proxies_enabled
 
   # = Create a new proxy service with for a specific ODS
   #
+  # @example
+  #
+  #   ProxyService.new(:queue_name).with_mechanize do |agent|
+  #     agent.get('...')
+  #   end
+  #
   # @param [String|Symbol] source name of the ODS (e.g. :tripadvisor), will look for a queue with that name "proxy/#{source}"
   # @param [Hash] options
   # @option options [Boolean] :proxies_enabled override the app configuration
   def initialize(source, options = {})
     @source = source
-    @proxies_enabled = options.fetch(:proxies_enabled, false) # Rails.application.config.proxies.enabled
+    @proxies_enabled = options.fetch(:proxies_enabled, !!self.class.proxies_enabled)
   end
 
   # @yield [agent] Passes a [proxied] Mechanize agent to the block

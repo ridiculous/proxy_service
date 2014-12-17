@@ -17,6 +17,6 @@ class ProxyService::MechanizeAgent < DelegateClass(Mechanize)
   # @param [#ip, #port] proxy object that holds the ip and port
   def set_proxy(proxy)
     return unless proxy.ip
-    __getobj__.set_proxy(proxy.ip, proxy.port, Rails.application.config.proxies.user, Rails.application.config.proxies.password)
+    __getobj__.set_proxy(proxy.ip, proxy.port, ProxyService.username, ProxyService.password)
   end
 end
