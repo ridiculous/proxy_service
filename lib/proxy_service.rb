@@ -39,13 +39,12 @@ class ProxyService
     agent.set_proxy(proxy)
     yield agent
     proxy.reset_failures
-  rescue => e
+  rescue
     if proxy.failures >= MAX_FAILURES
       proxy.blocked!
     else
       proxy.increment_failures
     end
-    puts "ERROR: #{e.message}"
   ensure
     proxy.release
   end
