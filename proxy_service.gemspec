@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["arebuckley@gmail.com"]
   spec.summary       = %q{Manages rotation of proxies using a queue}
   spec.description   = %q{Manages rotation of proxies using a queuing system and STOMP}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/ridiculous/proxy_service"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
