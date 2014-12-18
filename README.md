@@ -28,13 +28,13 @@ end
 ```
 And then use it in your app
 ```ruby
-ProxyService.new(:queue_name).with_mechanize do |agent|
+ProxyService.new('queue_with_proxies').with_mechanize do |agent|
   agent.get('http://...')
 end
 ```
 Some config settings can be overwritten on initialize
 ```ruby
-ProxyService.new('queue', proxies_enabled: false)
+ProxyService.new('queue_with_proxies', proxies_enabled: false)
 ```
 ## Contributing
 
