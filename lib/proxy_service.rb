@@ -2,34 +2,27 @@ require 'json'
 
 class ProxyService
 
-  POLL_PERIOD = 1
-  MAX_FAILURES = 3
-
   class << self
-    attr_accessor :proxies_enabled, :username, :password
+    attr_accessor :proxies_enabled, :username, :password, :failure_limit
 
     def configure
       yield self
     end
   end
 
-  attr_accessor :source
+  attr_accessor :source, :failure_limit
   attr_writer :proxies_enabled
 
   # = Create a new proxy service with for a specific ODS
   #
-  # @example
-  #
-  #   ProxyService.new(:queue_name).with_mechanize do |agent|
-  #     agent.get('...')
-  #   end
-  #
   # @param [String|Symbol] source name of the ODS (e.g. :tripadvisor), will look for a queue with that name "proxy/#{source}"
   # @param [Hash] options
-  # @option options [Boolean] :proxies_enabled override the app configuration
+  # @option options [Boolean] :proxies_enabled override the class configuration
+  # @option options [Integer] :failure_limit before blocking the proxy
   def initialize(source, options = {})
     @source = source
     @proxies_enabled = options.fetch(:proxies_enabled, !!self.class.proxies_enabled)
+    @failure_limit = options.fetch(:failure_limit, self.class.failure_limit || 3)
   end
 
   # @yield [agent] Passes a [proxied] Mechanize agent to the block
@@ -40,7 +33,7 @@ class ProxyService
     yield agent
     proxy.reset_failures
   rescue
-    if proxy.failures >= MAX_FAILURES
+    if proxy.failures >= failure_limit
       proxy.blocked!
     else
       proxy.increment_failures
@@ -53,19 +46,11 @@ class ProxyService
   # Private
   #
 
-  def new_worker
-    if proxies_enabled?
-      Worker.new("proxy/#{source}")
-    else
-      NullWorker.new
-    end
-  end
-
   def proxies_enabled?
     @proxies_enabled
   end
 
-  # = Creates a STOMP connection (consumer)
+  # = Sleeps until the worker receives a proxy (message)
   #
   # @return [Proxy] a new proxy object
   def reserve_proxy
@@ -75,8 +60,16 @@ class ProxyService
       if worker.ready?
         return Proxy.new(worker)
       else
-        sleep(POLL_PERIOD)
+        sleep(1)
       end
+    end
+  end
+
+  def new_worker
+    if proxies_enabled?
+      Worker.new("proxy/#{source}")
+    else
+      NullWorker.new
     end
   end
 end

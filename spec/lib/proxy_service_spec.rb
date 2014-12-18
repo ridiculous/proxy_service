@@ -51,7 +51,7 @@ describe ProxyService do
 
       context 'when +failures+ exceeds max failures' do
         it 'blocks the proxy' do
-          expect(proxy).to receive(:failures).and_return(ProxyService::MAX_FAILURES + 1)
+          expect(proxy).to receive(:failures).and_return(subject.failure_limit + 1)
           expect(proxy).to receive(:blocked!)
           subject.with_mechanize { |_| raise 'Testing exception' }
         end
