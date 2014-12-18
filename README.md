@@ -1,6 +1,6 @@
 # ProxyService
 
-A service class that rotates a list of proxies stored in a queue. The queueing system must support the STOMP protocol. Can be used with or without proxies. A queue name should be given and the queue should have a list of proxies in the format of `{ failures: 0, ip: '127.0.0.1', port: '80' }`. The service uses this info to set the proxy of a mechanize agent. If an exception occurs in the block, the proxy's `:failures` count is incremented and it's put back in the queue to be used again. Once the `:failures` count exceeds the `#failure_limit` it will be removed the queue.
+A service class that rotates a list of proxies stored in a queue. The queueing system must support the STOMP protocol. Can be used with or without proxies. A queue name should be given and the queue should have a list of proxies in the format of `{ failures: 0, ip: '127.0.0.1', port: '80' }`. The service uses this info to set the proxy of a mechanize agent. If an exception occurs in the block, the proxy's `:failures` count is incremented and it's put back in the queue to be used again. Once the `:failures` count exceeds the `#failure_limit` it will be removed from the queue.
 
 ## Installation
 
