@@ -32,11 +32,13 @@ class ProxyService
     agent.set_proxy(proxy)
     yield agent
     proxy.reset_failures
-  rescue
-    if proxy.failures >= failure_limit
-      proxy.blocked!
-    else
-      proxy.increment_failures
+  rescue Mechanize::ResponseCodeError => e
+    if e.response_code == '403' # "forbidden"
+      if proxy.failures >= failure_limit
+        proxy.blocked!
+      else
+        proxy.increment_failures
+      end
     end
   ensure
     proxy.release

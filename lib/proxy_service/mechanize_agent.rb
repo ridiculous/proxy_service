@@ -14,6 +14,7 @@ class ProxyService::MechanizeAgent < DelegateClass(Mechanize)
     end
   end
 
+  # @note proxy.ip should only be nil in the case where it's held by a NullWorker
   # @param [#ip, #port] proxy object that holds the ip and port
   def set_proxy(proxy)
     return unless proxy.ip

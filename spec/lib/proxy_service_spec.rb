@@ -43,24 +43,26 @@ describe ProxyService do
     end
 
     context 'when there is an exception' do
+      let(:mechanize_error) { Mechanize::ResponseCodeError.new(OpenStruct.new(code: '403')) }
+
       it 'does not reset the failures count' do
         expect(proxy).to_not receive(:reset_failures)
         expect(proxy).to receive(:release)
-        subject.with_mechanize { |_| raise 'Testing exception' }
+        subject.with_mechanize { |_| raise mechanize_error }
       end
 
       context 'when +failures+ exceeds max failures' do
         it 'blocks the proxy' do
           expect(proxy).to receive(:failures).and_return(subject.failure_limit + 1)
           expect(proxy).to receive(:blocked!)
-          subject.with_mechanize { |_| raise 'Testing exception' }
+          subject.with_mechanize { |_| raise mechanize_error }
         end
       end
 
       context 'when +failures+ does not exceed max failures' do
         it "increments the proxy's +failures+ count" do
           expect(proxy).to receive(:increment_failures)
-          subject.with_mechanize { |_| raise 'Testing exception' }
+          subject.with_mechanize { |_| raise mechanize_error }
         end
       end
     end
