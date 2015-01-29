@@ -21,9 +21,11 @@ Configure the service, for example, in an initializer
 ```ruby
 ProxyService.configure do |config|
   config.proxies_enabled = true
-  config.username = '...'  # only used when proxies enabled
-  config.password = '...'  # only used when proxies enabled
-  config.failure_limit = 3 # only used when proxies enabled
+  # only used when proxies enabled
+  config.username = '...'  
+  config.password = '...' 
+  config.failure_limit = 3
+  config.failure_codes = %w[503 403] # used to determine if the proxy has been blocked
 end
 ```
 And then use it in your app
