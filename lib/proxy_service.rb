@@ -12,6 +12,7 @@ class ProxyService
 
   attr_accessor :source, :failure_limit, :failure_codes
   attr_writer :proxies_enabled
+  attr_reader :proxy
 
   # = Create a new proxy service with for a specific ODS
   #
@@ -29,7 +30,7 @@ class ProxyService
 
   # @yield [agent] Passes a [proxied] Mechanize agent to the block
   def with_mechanize
-    proxy = reserve_proxy
+    @proxy = reserve_proxy
     agent = MechanizeAgent.new
     agent.set_proxy(proxy)
     yield agent
