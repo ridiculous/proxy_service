@@ -36,13 +36,9 @@ class ProxyService
     yield agent
     proxy.reset_failures
   rescue Mechanize::ResponseCodeError => e
-    if failure_codes.include?(e.response_code)
-      if proxy.failures >= failure_limit
-        proxy.blocked!
-      else
-        proxy.increment_failures
-      end
-    end
+    block_or_increment_proxy if failure_codes.include?(e.response_code)
+  rescue ProxyBlockedError, ReCaptchaError
+    block_or_increment_proxy
   ensure
     proxy.release
   end
@@ -50,6 +46,14 @@ class ProxyService
   #
   # Private
   #
+
+  def block_or_increment_proxy
+    if proxy.failures >= failure_limit
+      proxy.blocked!
+    else
+      proxy.increment_failures
+    end
+  end
 
   def proxies_enabled?
     @proxies_enabled
@@ -76,6 +80,16 @@ class ProxyService
     else
       NullWorker.new
     end
+  end
+
+  #
+  # Custom errors
+  #
+
+  class ProxyBlockedError < StandardError
+  end
+
+  class ReCaptchaError < StandardError
   end
 end
 
